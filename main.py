@@ -1,5 +1,8 @@
+from os.path import join
+
 import pygame as pg
 import sys
+from os import path
 from settings import *
 from player import Player
 from wall import Wall
@@ -20,17 +23,19 @@ class Game:
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
         self.playing = True
+        self.level_data = []
 
         self.load_data()
 
-    def load_data(self):
-        pass
-
     def new(self):
         self.all_sprites = pg.sprite.Group()
-        self.player = Player(self, 10, 10)
-        for x in range(10,20):
-            Wall(self, x, 20)
+        for row, tiles in enumerate(self.level_data):
+            for col, tile in enumerate(tiles):
+                if tile == '1':
+                    Wall(self, col, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
+
 
     def run(self):
         while self.playing:
@@ -74,6 +79,12 @@ class Game:
         for y in range(0, HEIGHT, TILESIZE):
             pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
 
+    def load_data(self):
+        game_folder = path.dirname(__file__)
+        file = path.join(game_folder, 'level', 'level.txt')
+        with open(file, 'rt') as f:
+            for line in f:
+                self.level_data.append(line)
 
 # create the game object
 g = Game()
